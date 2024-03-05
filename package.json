@@ -1,0 +1,28 @@
+{
+  "name": "cpu-bound",
+  "version": "1.0.0",
+  "description": "This project is to demonstrate and show the presence of hidden threads(6 in total) in Nodejs, understanding hidden threads in Nodejs, creating CPU-bound task without worker threads, offloading a CPU-bound task using promises, offloading a CPU-bound task with the worker-threads module, Optimizing a a CPU-intensive task using four worker threads",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon --exec ts-node ./src/server.ts",
+    "test": "server.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jopaleti/nodejs-threads.git"
+  },
+  "author": "jopaleti",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jopaleti/nodejs-threads/issues"
+  },
+  "homepage": "https://github.com/jopaleti/nodejs-threads#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.24",
+    "express": "^4.18.3",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
