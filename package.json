@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "nodemon --exec ts-node ./src/server.ts",
+    "start-thread-server": "nodemon --exec ts-node ./src/server_four_worker.ts",
     "test": "server.test.js"
   },
   "repository": {

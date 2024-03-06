@@ -1,11 +1,15 @@
 import express, { Request, Response } from "express";
 import getCurrentTimeInSeconds from "./helpers/time.helper";
-import { Worker, workerData } from "node:worker_threads";
+import { Worker } from "node:worker_threads";
 import * as path from "path";
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 8000;
 const cpu_worker = "./src/worker.ts";
+
+// Specifing the number of thread count
+const THREAD_COUNT = 4;
+
 /**
  * Non blocking route...
  * The main thread doesn't get block at this route
@@ -57,21 +61,33 @@ app.get("/blocking-offload", async (req: Request, res: Response) => {
 });
 
 /**
- * Offloading a CPU-Bound Task with the worker-threads Module
+ * Optimizing a CPU-Intensive Task Using Four Worker Threads
  */
+
+function createWorker() {
+  return new Promise((resolve, reject) => {
+    const worker = new Worker("./src/four_worker.mjs", {
+      workerData: { thread_count: THREAD_COUNT },
+    });
+    worker.on("message", (data) => {
+      resolve(data);
+    });
+    worker.on("error", (msg) => {
+      reject(`An error occured: ${msg}`);
+    });
+  });
+}
+
 app.get("/blocking-thread-offload", async (req: Request, res: Response) => {
-  const worker = new Worker("./src/worker.mjs");
-  worker.on("message", (data) => {
-    res.status(200).send(`The result is ${data}`);
-  });
-  worker.on("error", (msg) => {
-    res.status(500).send(`An error occured ${msg}`);
-  });
-  worker.on("exit", (code) => {
-    if (code != 0) {
-      console.error(new Error(`Worker stopped with exit code ${code}`));
-    }
-  });
+  const workerPromises: any[] = [];
+  for (let i = 0; i < THREAD_COUNT; i++) {
+    workerPromises.push(createWorker());
+  }
+  const thread_results = await Promise.all(workerPromises);
+
+  const total = thread_results.reduce((acc, result) => acc + result, 0);
+
+  res.status(200).send(`Result is ${total}`);
 });
 
 app.listen(PORT, () => {
